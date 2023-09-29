@@ -22,14 +22,14 @@ void AIOReader::callback(union sigval sv)
         aio->_aiocb.aio_offset += sz;
         if (aio->_callable)
             aio->_callable(aio->_block_buf, sz, sz != BLOCK_SZ);
-        if (sz == BLOCK_SZ && aio->_max_read == 0 || aio->_total_read < aio->_max_read)
-            aio_read(&aio->_aiocb);
+        if (sz == BLOCK_SZ)
+            aio->read();
     }
 }
 
 int AIOReader::read()
 {
-    if (_max_read != 0 && _total_read >= _max_read)
+    if (_max_read != 0 && _total_read >= _max_read || _stop_requested)
         return -1;
     return aio_read(&_aiocb);
 }
